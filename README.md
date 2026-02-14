@@ -25,7 +25,7 @@ Ry comes with a built-in installer for Linux and Windows systems.
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/your-username/Ry.git](https://github.com/your-username/Ry.git)
+   git clone [https://github.com/johnryzon123/Rylang.git](https://github.com/johnryzon123/Rylang.git)
    cd Ry
    ```
 2. **Build and Install:**
