@@ -36,11 +36,22 @@ namespace RyTools {
 		hadError = true;
 	}
 	inline std::string findModulePath(const std::string &name, bool isDirectory = false) {
-		std::vector<std::string> searchPaths = {"./modules/library", ".", "./modules",
-																									"/usr/lib/ry/"};
+		std::vector<std::string> searchPaths = {".", "./modules", "./modules/library"};
+
+#ifdef _WIN32
+		// Windows logic
+		if (const char *userProfile = std::getenv("USERPROFILE")) {
+			searchPaths.push_back(std::string(userProfile) + "/AppData/Local/Ry/lib");
+		}
+		searchPaths.push_back("C:/Program Files/Ry/lib");
+#else
+		// Unix (Linux/Mac) logic
 		if (const char *homeEnv = std::getenv("HOME")) {
 			searchPaths.push_back(std::string(homeEnv) + "/.local/share/ry/lib");
 		}
+		searchPaths.push_back("/usr/lib/ry/");
+		searchPaths.push_back("/usr/share/ry/lib");
+#endif
 
 		for (const auto &path: searchPaths) {
 			fs::path fullPath = fs::path(path) / name;
