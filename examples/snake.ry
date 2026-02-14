@@ -24,8 +24,8 @@ while running {
                 if seg == [x, y] { is_snake = true }
             }
             
-            if is_snake { row = row + "🟢" }
-            else if [x, y] == food { row = row + "🍎" }
+            if is_snake { row = row + "o" }
+            else if [x, y] == food { row = row + "0" }
             else { row = row + " · " }
         }
         out(row)
@@ -51,7 +51,6 @@ while running {
         # Move to the next "random" spot in our list
         food_index = (food_index + 1) % 7 # Loops back to 0 after 7 spots
         food = food_spots[food_index]
-        # Snake grows because we don't pop()
     } else {
         pop(snake)
     }
