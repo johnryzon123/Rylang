@@ -39,4 +39,21 @@ namespace Frontend {
 		}
 		std::string toString() override { return "<native fn clock>"; };
 	};
+	class RyClear : public RyCallable {
+public:
+    int arity() override { return 0; } // clear() takes no arguments
+    
+    RyValue call(Interpreter &interpreter, std::vector<RyValue> arguments) override {
+        #ifdef _WIN32
+						// Windows specific clear
+            std::system("cls");
+        #else
+            // Linux/macOS standard clear
+            std::cout << "\033[2J\033[1;1H"; 
+        #endif
+        return nullptr;
+    }
+
+    std::string toString() override { return "<native fn clear>"; }
+};
 } // namespace Frontend

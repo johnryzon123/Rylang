@@ -7,11 +7,11 @@ data dir = "RIGHT"
 data running = true
 
 while running {
-    # 1. Clear and Header
+    # Clear and Header
     out("\033[H\033[J")
     out("--- Ry Snake (Type 'exit' to quit) ---")
 
-    # 2. Render Board
+    # Render Board
     foreach data y in 0 to height {
         data row_str = ""
         foreach data x in 0 to width {
@@ -31,7 +31,7 @@ while running {
         out(row_str)
     }
 
-    # 3. Input Handling
+    # Input Handling
     data move = input("Move (wasd) or 'exit': ")
     
     # 4. The Exit Check
@@ -39,7 +39,7 @@ while running {
         running = false
         out("Thanks for playing Ry Snake!")
     } else {
-        # 5. Movement Logic
+        # Movement Logic
         data head = snake[0]
         data next_pos = [0, 0]
 
@@ -49,7 +49,7 @@ while running {
         else if move == "d" { next_pos = [head[0] + 1, head[1]] }
         else { next_pos = [head[0] + 1, head[1]] } # Keep moving forward
 
-        # 6. Update Body
+        # Update Body
         snake = [next_pos] + snake
         if next_pos == food {
             # In a real game, you'd randomize food here

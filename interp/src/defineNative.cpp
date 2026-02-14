@@ -50,5 +50,9 @@ namespace Frontend {
 		// clock()
 		auto clockFn = std::static_pointer_cast<RyCallable>(std::make_shared<ClockCallable>());
 		globals->define("clock", clockFn);
+
+		// clear()
+		auto clearFn = std::static_pointer_cast<RyCallable>(std::make_shared<RyClear>());
+		globals->define("clear", clearFn);
 	}
 } // namespace Frontend
