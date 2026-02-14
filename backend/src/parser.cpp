@@ -743,6 +743,20 @@ std::shared_ptr<Stmt> Parser::classStatement() {
 	return std::make_shared<ClassStmt>(name, std::move(methods), std::move(fields), isPrivate, superclass);
 }
 
+std::shared_ptr<Stmt> Parser::attemptStatement() {
+	std::vector<std::shared_ptr<Stmt>> attemptBody;
+	std::vector<std::shared_ptr<Stmt>> catchBody;
+
+	consume(TokenType::LBRACE, "Expect '{' before attempt block");
+	attemptBody = block();
+	if (match({TokenType::FAIL})) {
+		consume(TokenType::LBRACE, "Expect '{' before fail block");
+		catchBody = block();
+	}
+	return std::make_shared<AttemptStmt>(std::move(attemptBody), std::move(catchBody));
+
+}
+
 std::vector<std::shared_ptr<Stmt>> Parser::block() {
 	std::vector<std::shared_ptr<Stmt>> statements;
 	while (!check(TokenType::RBRACE) && !isAtEnd()) {

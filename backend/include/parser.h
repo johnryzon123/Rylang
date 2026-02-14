@@ -75,6 +75,8 @@ namespace Backend {
 		std::shared_ptr<Stmt> untilStatement();
 		std::shared_ptr<Stmt> namespaceStatement();
 		std::shared_ptr<Stmt> classStatement();
+		std::shared_ptr<Stmt> attemptStatement();
+
 		std::vector<std::shared_ptr<Stmt>> block();
 	};
 

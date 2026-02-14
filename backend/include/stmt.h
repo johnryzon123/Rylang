@@ -32,6 +32,7 @@ namespace Backend {
 	struct StopStmt;
 	struct SkipStmt;
 	struct ForStmt;
+	struct AttemptStmt;
 	struct StmtVisitor;
 
 	struct Stmt : public std::enable_shared_from_this<Stmt> {
@@ -56,6 +57,7 @@ namespace Backend {
 		virtual void visitSkipStmt(SkipStmt &stmt) = 0;
 		virtual void visitForStmt(ForStmt &stmt) = 0;
 		virtual void visitClassStmt(ClassStmt &stmt) = 0;
+		virtual void visitAttemptStmt(AttemptStmt &stmt) = 0;
 	};
 
 
@@ -145,7 +147,6 @@ namespace Backend {
 	};
 
 	struct BlockStmt : public Stmt {
-		// Note: If you switched to shared_ptr earlier, use that here instead!
 		std::vector<std::shared_ptr<Stmt>> statements;
 
 		BlockStmt(std::vector<std::shared_ptr<Stmt>> statements) : statements(std::move(statements)) {}
@@ -208,5 +209,14 @@ namespace Backend {
 				name(name), methods(std::move(methods)), fields(std::move(fields)), isPrivate(isPrivate),
 				superclass(std::move(superclass)) {}
 		void accept(StmtVisitor &visitor) override { visitor.visitClassStmt(*this); }
+	};
+	struct AttemptStmt : public Stmt {
+		std::vector<std::shared_ptr<Stmt>> attemptBody;
+		std::vector<std::shared_ptr<Stmt>> failBody;
+		Token error;
+
+		AttemptStmt(std::vector<std::shared_ptr<Stmt>> aBody, std::vector<std::shared_ptr<Stmt>> fBody, Token e) :
+			attemptBody(aBody), failBody(fBody), error(e) {}
+		void accept(StmtVisitor &visitor) override { visitor.visitAttemptStmt(*this); }
 	};
 } // namespace Backend
