@@ -1,29 +1,27 @@
-# Ry (Ry's for You) - Graphical Snake Prototype
+# Ry (Ry's for You) - Graphical Snake
 data width = 10
 data height = 10
 data snake = [[5,5], [5,4]]
 data food = [8,8]
 data dir = "RIGHT"
-data frame
+data running = true
 
-# Game Loop (15 frames)
-for frame = 0, frame < 15, frame = frame + 1 {
-    
-    out("--- Ry Snake (Frame: " + frame + ") ---")
+while running {
+    # 1. Clear and Header
+    out("\033[H\033[J")
+    out("--- Ry Snake (Type 'exit' to quit) ---")
 
-    # 2. Draw the Grid
+    # 2. Render Board
     foreach data y in 0 to height {
         data row_str = ""
         foreach data x in 0 to width {
             data is_snake = false
-            
-            # Check if current coordinate is part of the snake
             foreach data segment in snake {
                 if segment == [x, y] { is_snake = true }
             }
 
             if is_snake {
-                row_str = row_str + "🟩" 
+                row_str = row_str + "🟢" 
             } else if [x, y] == food {
                 row_str = row_str + "🍎"
             } else {
@@ -33,28 +31,30 @@ for frame = 0, frame < 15, frame = frame + 1 {
         out(row_str)
     }
 
-    # 3. Handle Input
-    out("Dir: [W] Up, [S] Down, [A] Left, [D] Right")
-    data move = input(">> ")
+    # 3. Input Handling
+    data move = input("Move (wasd) or 'exit': ")
     
-    # 4. Movement Logic
-    data head = snake[0]
-    data next_pos = [0, 0]
-
-    if move == "w" { next_pos = [head[0], head[1] - 1] }
-    else if move == "s" { next_pos = [head[0], head[1] + 1] }
-    else if move == "a" { next_pos = [head[0] - 1, head[1]] }
-    else if move == "d" { next_pos = [head[0] + 1, head[1]] }
-    else { next_pos = [head[0] + 1, head[1]] } # Default move
-
-    # 5. Update Snake Body
-    snake = [next_pos] + snake
-
-    # Check for Food
-    if next_pos == food {
-        out("Yum!")
-        # Add logic to move food elsewhere here later!
+    # 4. The Exit Check
+    if move == "exit" {
+        running = false
+        out("Thanks for playing Ry Snake!")
     } else {
-        pop(snake)
+        # 5. Movement Logic
+        data head = snake[0]
+        data next_pos = [0, 0]
+
+        if move == "w" { next_pos = [head[0], head[1] - 1] }
+        else if move == "s" { next_pos = [head[0], head[1] + 1] }
+        else if move == "a" { next_pos = [head[0] - 1, head[1]] }
+        else if move == "d" { next_pos = [head[0] + 1, head[1]] }
+        else { next_pos = [head[0] + 1, head[1]] } # Keep moving forward
+
+        # 6. Update Body
+        snake = [next_pos] + snake
+        if next_pos == food {
+            # In a real game, you'd randomize food here
+        } else {
+            pop(snake)
+        }
     }
 }
