@@ -50,7 +50,6 @@ namespace RyTools {
 			searchPaths.push_back(std::string(homeEnv) + "/.local/share/ry/lib");
 		}
 		searchPaths.push_back("/usr/lib/ry/");
-		searchPaths.push_back("/usr/share/ry/lib");
 #endif
 
 		for (const auto &path: searchPaths) {
