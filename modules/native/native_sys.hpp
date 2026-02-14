@@ -50,7 +50,7 @@ namespace Frontend {
 			std::system("cls");
 #else
 			// Linux/macOS standard clear
-			std::cout << "\033[2J\033[1;1H";
+			std::system("clear");
 #endif
 			return nullptr;
 		}
