@@ -1,8 +1,8 @@
-#include <iostream>
 #include <chrono>
+#include <iostream>
+#include "colors.h"
 #include "common.h"
 #include "func.h"
-#include "colors.h"
 
 namespace Frontend {
 	class RyExit : public RyCallable {
@@ -16,7 +16,8 @@ namespace Frontend {
 				exitCode = static_cast<int>(arguments[0].asNumber());
 			}
 
-			std::cout << RyColor::YELLOW << "[Ry] Process finished with exit code " << exitCode << std::endl << RyColor::RESET;
+			std::cout << RyColor::YELLOW << "[Ry] Process finished with exit code " << exitCode << std::endl
+								<< RyColor::RESET;
 			std::exit(exitCode);
 		}
 		std::shared_ptr<RyFunction> bind(std::shared_ptr<RyInstance> instance) override {
@@ -40,20 +41,25 @@ namespace Frontend {
 		std::string toString() override { return "<native fn clock>"; };
 	};
 	class RyClear : public RyCallable {
-public:
-    int arity() override { return 0; } // clear() takes no arguments
-    
-    RyValue call(Interpreter &interpreter, std::vector<RyValue> arguments) override {
-        #ifdef _WIN32
-						// Windows specific clear
-            std::system("cls");
-        #else
-            // Linux/macOS standard clear
-            std::cout << "\033[2J\033[1;1H"; 
-        #endif
-        return nullptr;
-    }
+	public:
+		int arity() override { return 0; } // clear() takes no arguments
 
-    std::string toString() override { return "<native fn clear>"; }
-};
+		RyValue call(Interpreter &interpreter, std::vector<RyValue> arguments) override {
+#ifdef _WIN32
+			// Windows specific clear
+			std::system("cls");
+#else
+			// Linux/macOS standard clear
+			std::cout << "\033[2J\033[1;1H";
+#endif
+			return nullptr;
+		}
+
+		std::shared_ptr<RyFunction> bind(std::shared_ptr<RyInstance> instance) override {
+			// Native functions aren't methods, so they don't bind to instances.
+			return nullptr;
+		}
+
+		std::string toString() override { return "<native fn clear>"; }
+	};
 } // namespace Frontend
