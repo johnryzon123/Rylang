@@ -1,0 +1,93 @@
+alias use("libry_string.so") as String
+
+class Calculator {
+    // Initializer to setup the state
+    func init(input) {
+        this.input_str = input
+        this.pos = 0
+    }
+
+    func peek() {
+        if this.pos >= len(this.input_str) { 
+            return "EOF" 
+        }
+        return String.substr(this.input_str, this.pos, 1)
+    }
+
+    func to_number(s) {
+        data res = 0
+        data i = 0
+        while i < len(s) {
+            data c = String.substr(s, i, 1)
+            if c == "0" { res = res * 10 + 0 }
+            if c == "1" { res = res * 10 + 1 }
+            if c == "2" { res = res * 10 + 2 }
+            if c == "3" { res = res * 10 + 3 }
+            if c == "4" { res = res * 10 + 4 }
+            if c == "5" { res = res * 10 + 5 }
+            if c == "6" { res = res * 10 + 6 }
+            if c == "7" { res = res * 10 + 7 }
+            if c == "8" { res = res * 10 + 8 }
+            if c == "9" { res = res * 10 + 9 }
+            i = i + 1
+        }
+        return res
+    }
+
+    func parse_number() {
+        data num_str = ""
+        data c = this.peek()
+        while c == "0" || c == "1" || c == "2" || c == "3" || c == "4" || 
+              c == "5" || c == "6" || c == "7" || c == "8" || c == "9" {
+            num_str = num_str + c
+            this.pos = this.pos + 1
+            c = this.peek()
+        }
+        return this.to_number(num_str)
+    }
+
+    func factor() {
+        data c = this.peek()
+        if c == "(" {
+            this.pos = this.pos + 1 // consume '('
+            data result = this.expr()
+            this.pos = this.pos + 1 // consume ')'
+            return result
+        }
+        return this.parse_number()
+    }
+
+    func term() {
+        data result = this.factor()
+        while this.peek() == "*" || this.peek() == "/" {
+            data op = this.peek()
+            this.pos = this.pos + 1
+            if op == "*" { result = result * this.factor() }
+            if op == "/" { result = result / this.factor() }
+        }
+        return result
+    }
+
+    func expr() {
+        data result = this.term()
+        while this.peek() == "+" || this.peek() == "-" {
+            data op = this.peek()
+            this.pos = this.pos + 1
+            if op == "+" { result = result + this.term() }
+            if op == "-" { result = result - this.term() }
+        }
+        return result
+    }
+
+    func solve() {
+        return this.expr()
+    }
+}
+
+// Main execution
+data myCalc = Calculator("10+(2*5)-4")
+data answer = myCalc.solve()
+
+out("Input: 10+(2*5)-4")
+out("Result: ")
+out(answer)
