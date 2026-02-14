@@ -1,7 +1,9 @@
 alias use("libry_string.so") as String
 
 class Calculator {
-    // Initializer to setup the state
+    data input_str
+    data pos
+
     func init(input) {
         this.input_str = input
         this.pos = 0
@@ -37,8 +39,8 @@ class Calculator {
     func parse_number() {
         data num_str = ""
         data c = this.peek()
-        while c == "0" || c == "1" || c == "2" || c == "3" || c == "4" || 
-              c == "5" || c == "6" || c == "7" || c == "8" || c == "9" {
+        while c == "0" or c == "1" or c == "2" or c == "3" or c == "4" or
+              c == "5" or c == "6" or c == "7" or c == "8" or c == "9" {
             num_str = num_str + c
             this.pos = this.pos + 1
             c = this.peek()
@@ -49,9 +51,9 @@ class Calculator {
     func factor() {
         data c = this.peek()
         if c == "(" {
-            this.pos = this.pos + 1 // consume '('
+            this.pos = this.pos + 1 # consume '('
             data result = this.expr()
-            this.pos = this.pos + 1 // consume ')'
+            this.pos = this.pos + 1 # consume ')'
             return result
         }
         return this.parse_number()
@@ -59,7 +61,7 @@ class Calculator {
 
     func term() {
         data result = this.factor()
-        while this.peek() == "*" || this.peek() == "/" {
+        while this.peek() == "*" or this.peek() == "/" {
             data op = this.peek()
             this.pos = this.pos + 1
             if op == "*" { result = result * this.factor() }
@@ -70,7 +72,7 @@ class Calculator {
 
     func expr() {
         data result = this.term()
-        while this.peek() == "+" || this.peek() == "-" {
+        while this.peek() == "+" or this.peek() == "-" {
             data op = this.peek()
             this.pos = this.pos + 1
             if op == "+" { result = result + this.term() }
@@ -84,10 +86,15 @@ class Calculator {
     }
 }
 
-// Main execution
-data myCalc = Calculator("10+(2*5)-4")
-data answer = myCalc.solve()
-
-out("Input: 10+(2*5)-4")
-out("Result: ")
-out(answer)
+# Main execution
+data isRunning = true
+while isRunning {
+  data line = input(">> ")
+  if line == "quit" { 
+    isRunning = false 
+  } else {
+    data myCalc = Calculator(line)
+    data answer = myCalc.solve()
+    out(answer)
+  }
+}
