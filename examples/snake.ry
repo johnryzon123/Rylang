@@ -11,7 +11,6 @@ data running = true
 
 while running {
     clear()
-    # Using your len() function for the score!
     data score = len(snake) - 2
     out("--- Ry Snake | Score: " + score + " ---")
 
