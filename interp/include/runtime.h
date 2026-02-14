@@ -37,6 +37,8 @@ namespace Frontend {
 		bool tryToDouble(const RyValue &v, double &out);
 		bool isInternalAccess(std::shared_ptr<RyInstance> instance);
 		std::map<Backend::Expr *, int> locals;
+		bool is_panicking = false;
+		RyValue panicMessage;
 
 	public:
 		std::set<std::string> typeAliases;

@@ -19,6 +19,8 @@ namespace Frontend {
 	/// If the value is a boolean, it is returned as a bool.
 	/// If the value is unknown, nullptr is returned.
 	void Interpreter::visitValue(ValueExpr &expr) {
+		if (is_panicking)
+			return;
 		if (expr.value.type == TokenType::NUMBER) {
 			lastResult = std::stod(expr.value.lexeme);
 		} else if (expr.value.type == TokenType::STRING) {
@@ -37,6 +39,8 @@ namespace Frontend {
 	}
 
 	void Interpreter::visitSet(SetExpr &expr) {
+		if (is_panicking)
+			return;
 		RyValue object = evaluate(expr.object.get());
 		RyValue value = evaluate(expr.value.get());
 
@@ -73,6 +77,8 @@ namespace Frontend {
 	}
 
 	void Interpreter::visitMap(MapExpr &expr) {
+		if (is_panicking)
+			return;
 		std::shared_ptr<Backend::Environment> map = std::make_shared<Backend::Environment>();
 
 		for (const auto &pair: expr.items) {
@@ -94,6 +100,8 @@ namespace Frontend {
 	///
 	/// @return The property value if the property exists, or an RyRuntimeError if it does not.
 	void Interpreter::visitGet(GetExpr &expr) {
+		if (is_panicking)
+			return;
 		RyValue object = evaluate(expr.object.get());
 
 		if (object.isMap()) {
@@ -166,6 +174,8 @@ namespace Frontend {
 	 * @throws RyRuntimeError If the operands are not numbers or matching types.
 	 */
 	void Interpreter::visitMath(MathExpr &expr) {
+		if (is_panicking)
+			return;
 		RyValue left = evaluate(expr.left.get());
 		RyValue right = evaluate(expr.right.get());
 
@@ -305,6 +315,8 @@ namespace Frontend {
 	}
 
 	void Interpreter::visitRange(RangeExpr &expr) {
+		if (is_panicking)
+			return;
 		RyValue start = evaluate(expr.leftBound.get());
 		RyValue end = evaluate(expr.rightBound.get());
 
@@ -340,6 +352,8 @@ namespace Frontend {
 	///
 	/// @return The result of the expression.
 	void Interpreter::visitPrefix(PrefixExpr &expr) {
+		if (is_panicking)
+			return;
 		const RyValue right = evaluate(expr.right.get());
 		if (expr.prefix.type == TokenType::PLUS_PLUS || expr.prefix.type == TokenType::MINUS_MINUS) {
 			auto var = dynamic_cast<VariableExpr *>(expr.right.get());
@@ -371,6 +385,8 @@ namespace Frontend {
 	}
 
 	void Interpreter::visitPostfix(PostfixExpr &expr) {
+		if (is_panicking)
+			return;
 		auto var = dynamic_cast<VariableExpr *>(expr.left.get());
 		if (!var)
 			throw RyRuntimeError(expr.postfix, "Target must be a variable.");
@@ -389,6 +405,8 @@ namespace Frontend {
 	}
 
 	void Interpreter::visitShift(ShiftExpr &expr) {
+		if (is_panicking)
+			return;
 		auto left = evaluate(expr.left.get());
 		auto right = evaluate(expr.right.get());
 		auto op = expr.op_t.type;
@@ -432,9 +450,15 @@ namespace Frontend {
 	}
 
 
-	void Interpreter::visitGroup(GroupExpr &expr) { lastResult = evaluate(expr.expression.get()); }
+	void Interpreter::visitGroup(GroupExpr &expr) {
+		if (is_panicking)
+			return;
+		lastResult = evaluate(expr.expression.get());
+	}
 
 	void Interpreter::visitVariable(VariableExpr &expr) {
+		if (is_panicking)
+			return;
 		// Check if the Resolver found a specific depth for this expression
 		auto it = locals.find(&expr);
 
@@ -467,6 +491,8 @@ namespace Frontend {
 	///
 	/// The result of the logical operation is stored in lastResult.
 	void Interpreter::visitLogical(LogicalExpr &expr) {
+		if (is_panicking)
+			return;
 		RyValue leftVal = evaluate(expr.left.get());
 		bool leftTruth = isTruthy(leftVal);
 
@@ -499,6 +525,8 @@ namespace Frontend {
 	///
 	/// @return The value of the assignment if it is a valid assign, or an RyRuntimeError if it is not.
 	void Interpreter::visitAssign(AssignExpr &expr) {
+		if (is_panicking)
+			return;
 		RyValue value = evaluate(expr.value.get());
 
 		auto it = locals.find(&expr);
@@ -547,6 +575,8 @@ namespace Frontend {
 	///
 	/// @return The result of the function call if it is a valid call, or an RyRuntimeError if it is not.
 	void Interpreter::visitCall(CallExpr &expr) {
+		if (is_panicking)
+			return;
 		RyValue callee = evaluate(expr.callee.get());
 
 		std::vector<RyValue> arguments;
@@ -590,6 +620,8 @@ namespace Frontend {
 	}
 
 	void Interpreter::visitBitwiseOr(BitwiseOrExpr &expr) {
+		if (is_panicking)
+			return;
 		auto left = evaluate(expr.left.get());
 		auto right = evaluate(expr.right.get());
 
@@ -603,6 +635,8 @@ namespace Frontend {
 	}
 
 	void Interpreter::visitBitwiseXor(BitwiseXorExpr &expr) {
+		if (is_panicking)
+			return;
 		auto left = evaluate(expr.left.get());
 		auto right = evaluate(expr.right.get());
 
@@ -616,6 +650,8 @@ namespace Frontend {
 	}
 
 	void Interpreter::visitBitwiseAnd(BitwiseAndExpr &expr) {
+		if (is_panicking)
+			return;
 		auto left = evaluate(expr.left.get());
 		auto right = evaluate(expr.right.get());
 
@@ -630,6 +666,8 @@ namespace Frontend {
 
 
 	void Interpreter::visitList(ListExpr &expr) {
+		if (is_panicking)
+			return;
 		auto list = std::make_shared<std::vector<RyValue>>();
 
 		for (const auto &element: expr.elements) {
@@ -647,6 +685,8 @@ namespace Frontend {
 	///
 	/// @return The value at the given index.
 	void Interpreter::visitIndex(IndexExpr &expr) {
+		if (is_panicking)
+			return;
 		RyValue callee = evaluate(expr.object.get());
 		RyValue indexVal = evaluate(expr.index.get());
 
@@ -687,6 +727,8 @@ namespace Frontend {
 	}
 
 	void Interpreter::visitIndexSet(IndexSetExpr &expr) {
+		if (is_panicking)
+			return;
 		RyValue object = evaluate(expr.object.get());
 		RyValue indexVal = evaluate(expr.index.get());
 		RyValue value = evaluate(expr.value.get());
@@ -722,17 +764,29 @@ namespace Frontend {
 
 		throw RyRuntimeError(expr.bracket, "Only lists and maps support indexed assignment.");
 	}
-	void Interpreter::visitThis(ThisExpr &expr) { lastResult = environment->get(expr.keyword); }
+	void Interpreter::visitThis(ThisExpr &expr) {
+		if (is_panicking)
+			return;
+		lastResult = environment->get(expr.keyword);
+	}
 	/// Evaluates the given block of statements in the given scope.
 	void Interpreter::visitBlockStmt(BlockStmt &stmt) {
+		if (is_panicking)
+			return;
 		auto localEnv = std::make_shared<Environment>(this->environment);
 		executeBlock(stmt.statements, *localEnv);
 	}
 
-	void Interpreter::visitExpressionStmt(ExpressionStmt &stmt) { evaluate(stmt.expression.get()); }
+	void Interpreter::visitExpressionStmt(ExpressionStmt &stmt) {
+		if (is_panicking)
+			return;
+		evaluate(stmt.expression.get());
+	}
 
 	/// Evaluates the expression part of a FunctionStmt and defines it in the current scope.
 	void Interpreter::visitFunctionStmt(FunctionStmt &stmt) {
+		if (is_panicking)
+			return;
 		auto stmtPtr = std::static_pointer_cast<FunctionStmt>(stmt.shared_from_this());
 
 		auto internalFunc =
@@ -745,6 +799,8 @@ namespace Frontend {
 	}
 	/// Evaluates the expression part of an ImportStmt and adds the module to the current scope's loaded modules.
 	void Interpreter::visitImportStmt(ImportStmt &stmt) {
+		if (is_panicking)
+			return;
 		std::string moduleName = stmt.module.lexeme;
 
 		// Basic Sanitization
@@ -818,6 +874,8 @@ namespace Frontend {
 
 	/// Evaluates the expression part of a VarStmt and defines it in the current scope.
 	void Interpreter::visitVarStmt(VarStmt &stmt) {
+		if (is_panicking)
+			return;
 		std::string constraint = "";
 
 		// Handle the raw 'data' keyword (data::num)
@@ -852,6 +910,8 @@ namespace Frontend {
 
 	/// Evaluates the expression part of an AliasStmt and defines it in the current scope.
 	void Interpreter::visitAliasStmt(AliasStmt &stmt) {
+		if (is_panicking)
+			return;
 		// Check if the target is a type alias (data::num or num)
 		if (isTypeAlias(stmt.aliasExpr)) {
 			std::string originalType = getTypeName(stmt.aliasExpr);
@@ -874,6 +934,8 @@ namespace Frontend {
 
 	/// Evaluates the expression part of a ReturnStmt and throws a ReturnSignal with the evaluated value.
 	void Interpreter::visitReturnStmt(ReturnStmt &stmt) {
+		if (is_panicking)
+			return;
 		RyValue value = nullptr;
 		if (stmt.value != nullptr) {
 			value = evaluate(stmt.value.get());
@@ -886,6 +948,8 @@ namespace Frontend {
 	/// @param stmt The WhileStmt node to visit.
 	/// @return void if the condition is true, or an empty value if the condition is false.
 	void Interpreter::visitWhileStmt(WhileStmt &stmt) {
+		if (is_panicking)
+			return;
 		while (isTruthy(evaluate(stmt.condition.get()))) {
 			try {
 				execute(stmt.body.get());
@@ -902,6 +966,8 @@ namespace Frontend {
 	/// @param stmt The IfStmt node to visit.
 	/// @return void if the condition is true, or an empty value if the condition is false.
 	void Interpreter::visitIfStmt(IfStmt &stmt) {
+		if (is_panicking)
+			return;
 		if (RyValue conditionValue = evaluate(stmt.condition.get()); isTruthy(conditionValue)) {
 			execute(stmt.thenBranch.get());
 		} else if (stmt.elseBranch != nullptr) {
@@ -914,6 +980,8 @@ namespace Frontend {
 	/// The namespace body is executed in the new environment, and the environment itself is stored as the value of the
 	/// namespace. The namespace is defined in the current scope, and the environment is stored as the value.
 	void Interpreter::visitNamespaceStmt(NamespaceStmt &stmt) {
+		if (is_panicking)
+			return;
 		auto namespaceEnv = std::make_shared<Environment>(this->environment);
 
 		std::shared_ptr<Environment> previous = this->environment;
@@ -932,6 +1000,8 @@ namespace Frontend {
 		environment->define(stmt.name.lexeme, namespaceEnv);
 	}
 	void Interpreter::visitEachStmt(EachStmt &stmt) {
+		if (is_panicking)
+			return;
 		RyValue collection = evaluate(stmt.collection.get());
 
 		if (!collection.isList()) {
@@ -964,9 +1034,19 @@ namespace Frontend {
 
 		this->environment = previous;
 	}
-	void Interpreter::visitStopStmt(StopStmt &stmt) { throw StopSignal(); }
-	void Interpreter::visitSkipStmt(SkipStmt &stmt) { throw SkipSignal(); }
+	void Interpreter::visitStopStmt(StopStmt &stmt) {
+		if (is_panicking)
+			return;
+		throw StopSignal();
+	}
+	void Interpreter::visitSkipStmt(SkipStmt &stmt) {
+		if (is_panicking)
+			return;
+		throw SkipSignal();
+	}
 	void Interpreter::visitForStmt(ForStmt &stmt) {
+		if (is_panicking)
+			return;
 		auto loopEnv = std::make_shared<Environment>(this->environment);
 		std::shared_ptr<Environment> previous = this->environment;
 		this->environment = loopEnv;
@@ -993,6 +1073,8 @@ namespace Frontend {
 		this->environment = previous;
 	}
 	void Interpreter::visitClassStmt(ClassStmt &stmt) {
+		if (is_panicking)
+			return;
 		RyValue superVal = nullptr;
 		std::shared_ptr<RyClass> superclass = nullptr;
 		if (stmt.superclass != nullptr) {

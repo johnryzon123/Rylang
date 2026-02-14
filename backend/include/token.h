@@ -76,6 +76,8 @@ namespace Backend {
 		CLASS,
 		PRIVATE,
 		CHILDOF,
+		ATTEMPT,
+		FAIL,
 
 
 		// Misc
@@ -94,15 +96,14 @@ namespace Backend {
 	};
 
 	inline static const std::unordered_map<std::string, TokenType> keywords{
-			{"import", TokenType::IMPORT}, {"func", TokenType::FUNC},				{"while", TokenType::WHILE},
-			{"if", TokenType::IF},				 {"else", TokenType::ELSE},				{"true", TokenType::TRUE},
-			{"false", TokenType::FALSE},	 {"null", TokenType::NULL_TOKEN}, {"for", TokenType::FOR},
-			{"and", TokenType::AND},			 {"or", TokenType::OR},						{"alias", TokenType::ALIAS},
-			{"return", TokenType::RETURN}, {"as", TokenType::AS},						{"namespace", TokenType::NAMESPACE},
-			{"data", TokenType::DATA},		 {"this", TokenType::THIS},				{"to", TokenType::TO},
-			{"in", TokenType::IN},				 {"foreach", TokenType::EACH},		{"stop", TokenType::STOP},
-			{"skip", TokenType::SKIP},		 {"unless", TokenType::UNLESS},		{"until", TokenType::UNTIL},
-			{"do", TokenType::DO},				 {"class", TokenType::CLASS}, {"private", TokenType::PRIVATE},
-			{"childof", TokenType::CHILDOF}
-	};
+			{"import", TokenType::IMPORT},	 {"func", TokenType::FUNC},				{"while", TokenType::WHILE},
+			{"if", TokenType::IF},					 {"else", TokenType::ELSE},				{"true", TokenType::TRUE},
+			{"false", TokenType::FALSE},		 {"null", TokenType::NULL_TOKEN}, {"for", TokenType::FOR},
+			{"and", TokenType::AND},				 {"or", TokenType::OR},						{"alias", TokenType::ALIAS},
+			{"return", TokenType::RETURN},	 {"as", TokenType::AS},						{"namespace", TokenType::NAMESPACE},
+			{"data", TokenType::DATA},			 {"this", TokenType::THIS},				{"to", TokenType::TO},
+			{"in", TokenType::IN},					 {"foreach", TokenType::EACH},		{"stop", TokenType::STOP},
+			{"skip", TokenType::SKIP},			 {"unless", TokenType::UNLESS},		{"until", TokenType::UNTIL},
+			{"do", TokenType::DO},					 {"class", TokenType::CLASS},			{"private", TokenType::PRIVATE},
+			{"childof", TokenType::CHILDOF}, {"attempt", TokenType::ATTEMPT}, {"fail", TokenType::FAIL}};
 } // namespace Backend
