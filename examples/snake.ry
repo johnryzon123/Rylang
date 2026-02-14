@@ -8,7 +8,7 @@ data running = true
 
 while running {
     # Clear and Header
-    out("\033[H\033[J")
+    clear()
     out("--- Ry Snake (Type 'exit' to quit) ---")
 
     # Render Board
