@@ -558,15 +558,6 @@ namespace Frontend {
 				maxArgs = ryFunc->declaration->parameters.size();
 			}
 
-			// The Range Check
-			if (arguments.size() < minArgs || arguments.size() > maxArgs) {
-				std::string msg = (minArgs == maxArgs) ? "Expected " + std::to_string(minArgs) + " arguments."
-																							 : "Expected between " + std::to_string(minArgs) + " and " +
-																										 std::to_string(maxArgs) + " arguments.";
-
-				throw RyRuntimeError(expr.Paren, msg + " but got " + std::to_string(arguments.size()) + ".");
-			}
-
 			if (minArgs != -1) {
 				if (arguments.size() < minArgs || arguments.size() > maxArgs) {
 					std::string msg = (minArgs == maxArgs) ? "Expected " + std::to_string(minArgs) + " arguments."
