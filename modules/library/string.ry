@@ -1,0 +1,16 @@
+# string.ry - A Ry Standard Library
+# "Ry's for You" - Feel free to modify these functions!
+
+namespace String {
+    data _lib = use("./build/libry_string.so")
+
+    func upper(data s) {
+        return _lib.upper(s)
+    }
+    func lower(data s) {
+        return _lib.lower(s)
+    }
+    func substr(data s, data start, data length) {
+        return _lib.substr(s, start, length)
+    }
+}

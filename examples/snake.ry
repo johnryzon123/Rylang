@@ -1,0 +1,33 @@
+# Snake Prototype
+data snake = [[5,5], [5,4]]
+data food = [8,8]
+data dir = ""
+
+# A "Game Loop"
+for (data i = 0, i < 10, i = i + 1) {
+    dir = input("Enter Direction 'LEFT' for left, 'RIGHT' for right, 'QUIT' to exit: ")
+    data head = snake[0]
+    data new_head = [0,0]
+
+    # Simple movement logic
+    if (dir == "RIGHT") { 
+      new_head = [head[0] + 1, head[1]] 
+    } else if (dir == "LEFT") {
+      new_head = [head[0] - 1, head[1]]
+    } else if (dir == "QUIT") {
+      exit(0)
+    }
+    
+    # Update Snake (The "Ry" Way)
+    # Note: This is where we use our new array addition!
+    snake = [new_head] + snake
+    
+    if (new_head == food) {
+        out("Ate food!")
+        # Don't pop, so the snake grows
+    } else {
+        pop(snake)
+    }
+
+    out(snake)
+}

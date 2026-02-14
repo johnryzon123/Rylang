@@ -1,0 +1,17 @@
+data limit = 1000
+data count = 0
+
+foreach data n in 2 to limit {
+    data isPrime = true
+    foreach data i in 2 to (n / 2) {
+        if n % i == 0 {
+            isPrime = false
+            stop
+        }
+    }
+    if isPrime {
+        count = count + 1
+    }
+}
+
+out("Primes found: " + count)

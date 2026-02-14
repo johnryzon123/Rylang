@@ -1,0 +1,40 @@
+cmake_minimum_required(VERSION 3.20)
+project(RyLang)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON) # Important for plugins
+
+include_directories(middleend/include backend/include interp/include modules/native backend/include/platform misc)
+
+# Use GLOB_RECURSE (singular GLOB, plural RECURSE)
+file(GLOB_RECURSE BACKEND_SOURCES "backend/src/*.cpp")
+file(GLOB_RECURSE INTERP_SOURCES "interp/src/*.cpp")
+file(GLOB_RECURSE NATIVE_SOURCES "modules/native/*.cpp")
+file(GLOB_RECURSE MIDDLEEND_SOURCES "middleend/src/*.cpp")
+
+# Add the library first
+add_library(ry_core STATIC 
+    ${BACKEND_SOURCES} 
+    ${INTERP_SOURCES} 
+    ${MIDDLEEND_SOURCES}
+    ${NATIVE_SOURCES}
+)
+
+# NOW define the 'ry' target so set_target_properties can find it
+add_executable(ry main.cpp) 
+
+# Now you can link and set properties
+target_link_libraries(ry PRIVATE ry_core)
+if (UNIX)
+    target_link_libraries(ry_core PUBLIC dl)
+endif()
+
+set_target_properties(ry PROPERTIES OUTPUT_NAME "ry")
+
+# Tell the linker to export symbols from the executable
+# This allows the .so to find the 'Interpreter' class inside 'ry'
+set_target_properties(ry PROPERTIES ENABLE_EXPORTS ON)
+
+# The Module
+add_library(ry_string SHARED modules/lib_cpp/string.cpp)
+target_link_libraries(ry_string ry_core)
