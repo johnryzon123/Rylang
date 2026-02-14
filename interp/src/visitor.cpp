@@ -440,11 +440,17 @@ namespace Frontend {
 
 		if (it != locals.end()) {
 			int distance = it->second;
-			RyVariable &var = environment->getAt(distance, expr.name.lexeme);
-			if (var.isPrivate && !environment->has(expr.name.lexeme, expr.name)) {
-				throw "Cannot access private member '" + expr.name.lexeme + "'.";
+			if (distance != -1) {
+				RyVariable &var = environment->getAt(distance, expr.name.lexeme);
+				if (var.isPrivate && !environment->has(expr.name.lexeme, expr.name)) {
+					throw "Cannot access private member '" + expr.name.lexeme + "'.";
+				}
+				lastResult = var.value;
+			} else if (distance == -1) {
+				globals->getVariable(expr.name);
+				lastResult = globals->getVariable(expr.name).value;
 			}
-			lastResult = var.value;
+
 		} else {
 			// If it's not in 'locals', it's a Global.
 			// Get it from your top-level 'globals' environment.
@@ -498,31 +504,35 @@ namespace Frontend {
 		auto it = locals.find(&expr);
 		if (it != locals.end()) {
 			int distance = it->second;
-			RyVariable &var = environment->getAt(distance, expr.name.lexeme);
-			// Check the rule
-			if (var.typeConstraint.has_value()) {
-				std::string constraint = var.typeConstraint.value();
+			if (distance != -1) {
+				RyVariable &var = environment->getAt(distance, expr.name.lexeme);
+				// Check the rule
+				if (var.typeConstraint.has_value()) {
+					std::string constraint = var.typeConstraint.value();
 
-				// Simple check: if constraint is "string", is the value a string?
-				if (constraint == "string" && !value.isString()) {
-					throw RyRuntimeError(expr.name, "Type Error: Cannot assign non-string to a string variable.");
-				} else if (constraint == "num" && !value.isNumber()) {
-					throw RyRuntimeError(expr.name, "Type Error: Cannot assign non-number to a number variable.");
-				} else if (constraint == "bool" && !value.isBool()) {
-					throw RyRuntimeError(expr.name, "Type Error: Cannot assign non-boolean to a boolean variable.");
-				} else if (constraint == "list" && !value.isList()) {
-					throw RyRuntimeError(expr.name, "Type Error: Cannot assign non-list to a list variable.");
-				} else if (constraint == "map" && value.isMap()) {
-					throw RyRuntimeError(expr.name, "Type Error: Cannot assign non-map to a map variable.");
+					// Simple check: if constraint is "string", is the value a string?
+					if (constraint == "string" && !value.isString()) {
+						throw RyRuntimeError(expr.name, "Type Error: Cannot assign non-string to a string variable.");
+					} else if (constraint == "num" && !value.isNumber()) {
+						throw RyRuntimeError(expr.name, "Type Error: Cannot assign non-number to a number variable.");
+					} else if (constraint == "bool" && !value.isBool()) {
+						throw RyRuntimeError(expr.name, "Type Error: Cannot assign non-boolean to a boolean variable.");
+					} else if (constraint == "list" && !value.isList()) {
+						throw RyRuntimeError(expr.name, "Type Error: Cannot assign non-list to a list variable.");
+					} else if (constraint == "map" && value.isMap()) {
+						throw RyRuntimeError(expr.name, "Type Error: Cannot assign non-map to a map variable.");
+					}
 				}
-			}
-			// Check if variable is in current environment
-			if (var.isPrivate && !environment->has(expr.name.lexeme, expr.name)) {
-				throw RyRuntimeError(expr.name, "Cannot access private member '" + expr.name.lexeme + "'.");
-			}
+				// Check if variable is in current environment
+				if (var.isPrivate && !environment->has(expr.name.lexeme, expr.name)) {
+					throw RyRuntimeError(expr.name, "Cannot access private member '" + expr.name.lexeme + "'.");
+				}
 
 
-			var.value = value;
+				var.value = value;
+			} else if (distance == -1) {
+				globals->assign(expr.name, RyVariable{value, false, std::nullopt});
+			}
 		} else {
 			globals->assign(expr.name, RyVariable{value, false, std::nullopt});
 		}

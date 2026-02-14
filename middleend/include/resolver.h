@@ -12,6 +12,7 @@ using namespace Backend;
 class Resolver : public Backend::ExprVisitor, public Backend::StmtVisitor {
 	Frontend::Interpreter &interpreter;
 	std::vector<std::map<std::string, bool>> scopes; // Stack of scopes
+	std::map<std::string, int> globalSymbols;
 	enum class FunctionType { NONE, FUNCTION, METHOD, INITIALIZER };
 
 	// This tells us if we are inside a class definition

@@ -30,8 +30,10 @@ void Resolver::resolveFunction(std::shared_ptr<FunctionStmt> function, FunctionT
 }
 
 void Resolver::declare(Token name) {
-	if (scopes.empty())
-		return; // Global scope, skip resolution
+	if (scopes.empty()) {
+		globalSymbols[name.lexeme] = false;
+		return;
+	}
 
 	auto &scope = scopes.back();
 	if (scope.contains(name.lexeme)) {
@@ -43,8 +45,10 @@ void Resolver::declare(Token name) {
 }
 
 void Resolver::define(Token name) {
-	if (scopes.empty())
+	if (scopes.empty()) {
+		globalSymbols[name.lexeme] = true;
 		return;
+	}
 	scopes.back()[name.lexeme] = true; // "true" means ready for use
 }
 
@@ -79,6 +83,9 @@ void Resolver::resolveLocal(Expr *expr, Token name) {
 			interpreter.resolve(expr, scopes.size() - 1 - i);
 			return;
 		}
+	}
+	if (globalSymbols.contains(name.lexeme)) {
+		interpreter.resolve(expr, -1);
 	}
 }
 
