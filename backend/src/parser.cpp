@@ -532,28 +532,28 @@ std::shared_ptr<Stmt> Parser::forStatement() {
 }
 
 std::shared_ptr<Stmt> Parser::eachStatement() {
-  loopDepth++;
-  Token typeToken(TokenType::Nothing_Here, "", RyValue(), 0, 0); // Rename to avoid confusion
+	loopDepth++;
+	Token typeToken(TokenType::Nothing_Here, "", RyValue(), 0, 0); // Rename to avoid confusion
 
-  consume(TokenType::DATA, "Expect 'data' in each loop.");
-  
-  if (match({TokenType::DOUBLE_COLON})) {
-    typeToken = consume(TokenType::IDENTIFIER, "Expect type name after '::'.");
-  }
+	consume(TokenType::DATA, "Expect 'data' in each loop.");
 
-  Token name = consume(TokenType::IDENTIFIER, "Expect variable name.");
-  consume(TokenType::IN, "Expect 'in' after variable name.");
-  
-  auto iterable = expression();
-  
-  auto body = statement();
-  loopDepth--;
+	if (match({TokenType::DOUBLE_COLON})) {
+		typeToken = consume(TokenType::IDENTIFIER, "Expect type name after '::'.");
+	}
 
-  if (typeToken.type == TokenType::Nothing_Here) {
-    return std::make_shared<EachStmt>(name, iterable, body);
-  } else {
-    return std::make_shared<EachStmt>(name, iterable, body, typeToken);
-  }
+	Token name = consume(TokenType::IDENTIFIER, "Expect variable name.");
+	consume(TokenType::IN, "Expect 'in' after variable name.");
+
+	auto iterable = expression();
+
+	auto body = statement();
+	loopDepth--;
+
+	if (typeToken.type == TokenType::Nothing_Here) {
+		return std::make_shared<EachStmt>(name, iterable, body);
+	} else {
+		return std::make_shared<EachStmt>(name, iterable, body, typeToken);
+	}
 }
 
 std::shared_ptr<Stmt> Parser::AliasDeclaration() {
@@ -598,19 +598,17 @@ std::shared_ptr<VarStmt> Parser::typeDeclaration(std::optional<Token> prefix, bo
 	std::shared_ptr<Expr> initializer = nullptr;
 	std::optional<Token> innerTypeToken = std::nullopt;
 	Token name = Token(TokenType::Nothing_Here, "", RyValue(), 0, 0);
-	do {
 
-		if (match({TokenType::DOUBLE_COLON})) {
-			innerTypeToken = consume(TokenType::IDENTIFIER, "Expect type after '::'.");
-		}
+	if (match({TokenType::DOUBLE_COLON})) {
+		innerTypeToken = consume(TokenType::IDENTIFIER, "Expect type after '::'.");
+	}
 
-		name = consume(TokenType::IDENTIFIER, "Expect variable name.");
+	name = consume(TokenType::IDENTIFIER, "Expect variable name.");
 
 
-		if (match({TokenType::EQUAL})) {
-			initializer = expression();
-		}
-	} while (match({TokenType::COMMA}));
+	if (match({TokenType::EQUAL})) {
+		initializer = expression();
+	}
 
 
 	return std::make_shared<VarStmt>(typeToken, innerTypeToken, name, initializer, isPrivate);
