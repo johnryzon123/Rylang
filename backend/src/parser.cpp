@@ -394,6 +394,8 @@ std::shared_ptr<Stmt> Parser::statement() {
 		return classStatement();
 	if (match({TokenType::ATTEMPT}))
 		return attemptStatement();
+	if (match({TokenType::PANIC}))
+		return panicStatement();
 	return expressionStatement();
 }
 
@@ -758,7 +760,14 @@ std::shared_ptr<Stmt> Parser::attemptStatement() {
 		catchBody = block();
 	}
 	return std::make_shared<AttemptStmt>(std::move(attemptBody), std::move(catchBody), error);
+}
 
+std::shared_ptr<Stmt> Parser::panicStatement() {
+	Token keyword = previous();
+	std::shared_ptr<Expr> value = nullptr;
+	if (!check(TokenType::RBRACE) && !isAtEnd()) 
+		value = expression();
+	return std::make_shared<PanicStmt>(keyword, value);
 }
 
 std::vector<std::shared_ptr<Stmt>> Parser::block() {

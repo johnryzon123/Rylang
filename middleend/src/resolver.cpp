@@ -294,3 +294,9 @@ void Resolver::visitAttemptStmt(AttemptStmt &stmt) {
 	resolve(stmt.failBody);
 	endScope();
 }
+void Resolver::visitPanicStmt(PanicStmt &stmt) {
+	beginScope();
+	if (stmt.message != nullptr)
+		resolve(stmt.message);
+	endScope();
+}

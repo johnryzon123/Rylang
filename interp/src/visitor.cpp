@@ -1,5 +1,6 @@
 #include <cmath>
 #include "class.h"
+#include "common.h"
 #include "env.h"
 #include "lexer.h"
 #include "native_io.hpp"
@@ -1145,5 +1146,12 @@ namespace Frontend {
 			is_panicking = true;
 			std::cerr << "Internal Engine Error: " << e.what() << "\n";
 		}
+	}
+	void Interpreter::visitPanicStmt(PanicStmt &stmt) {
+		RyValue message;
+		if (stmt.message != nullptr)
+			message = evaluate(stmt.message.get());
+
+		throw RyRuntimeError(stmt.keyword, message.toString());
 	}
 } // namespace Frontend

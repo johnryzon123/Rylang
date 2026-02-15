@@ -76,6 +76,7 @@ namespace Backend {
 		std::shared_ptr<Stmt> namespaceStatement();
 		std::shared_ptr<Stmt> classStatement();
 		std::shared_ptr<Stmt> attemptStatement();
+		std::shared_ptr<Stmt> panicStatement();
 
 		std::vector<std::shared_ptr<Stmt>> block();
 	};

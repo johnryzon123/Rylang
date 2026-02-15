@@ -73,4 +73,5 @@ public:
 	void visitBitwiseAnd(BitwiseAndExpr &expr);
 	void visitShift(ShiftExpr &expr);
 	void visitAttemptStmt(AttemptStmt &stmt);
+	void visitPanicStmt(PanicStmt &stmt);
 };

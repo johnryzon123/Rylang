@@ -89,6 +89,7 @@ namespace Frontend {
 		void visitForStmt(ForStmt &stmt) override;
 		void visitClassStmt(ClassStmt &stmt) override;
 		void visitAttemptStmt(AttemptStmt &stmt) override;
+		void visitPanicStmt(PanicStmt &stmt) override;
 	};
 
 } // namespace Frontend
