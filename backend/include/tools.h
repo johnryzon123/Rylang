@@ -96,7 +96,10 @@ namespace RyTools {
 	struct RyRuntimeError {
 		const Backend::Token token;
 		const std::string message;
-		RyRuntimeError(Backend::Token token, std::string message) : token(std::move(token)), message(std::move(message)) {}
+		RyValue type;
+
+		RyRuntimeError(Backend::Token token, std::string message, RyValue type = "GeneralError") :
+				token(std::move(token)), message(std::move(message)), type(type) {}
 	};
 	struct ParseError : public std::runtime_error {
 		ParseError() : std::runtime_error("") {}

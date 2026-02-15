@@ -7,6 +7,7 @@
 #include <memory>
 #include <optional>
 #include "../include/tools.h"
+#include "common.h"
 #include "expr.h"
 #include "optimizer.h"
 #include "stmt.h"
@@ -752,19 +753,23 @@ std::shared_ptr<Stmt> Parser::attemptStatement() {
 	std::vector<std::shared_ptr<Stmt>> failBody;
 	Token error = Token(TokenType::Nothing_Here, "", RyValue(), 0, 0);
 	std::vector<std::shared_ptr<Stmt>> finallyBody;
+	Token errorType = Token(TokenType::IDENTIFIER, "GeneralError", RyValue(), 0, 0);
 
-	consume(TokenType::LBRACE, "Expect '{' before attempt block");
+	consume(TokenType::LBRACE, "Expect '{' before attempt block.");
 	attemptBody = block();
 	if (match({TokenType::FAIL})) {
 		error = consume(TokenType::IDENTIFIER, "Expect error name after 'fail'");
+		if (match({TokenType::DOUBLE_COLON})) {
+			errorType = consume(TokenType::IDENTIFIER, "Expect error type after '::'.");
+		}
 		consume(TokenType::LBRACE, "Expect '{' before fail block");
 		failBody = block();
 	}
 	if (match({TokenType::FINALLY})) {
-		consume(TokenType::LBRACE, "Expect '{' before finally block");
+		consume(TokenType::LBRACE, "Expect '{' before finally block.");
 		finallyBody = block();
 	}
-	return std::make_shared<AttemptStmt>(std::move(attemptBody), std::move(failBody), error, finallyBody);
+	return std::make_shared<AttemptStmt>(std::move(attemptBody), std::move(failBody), error, finallyBody, errorType);
 }
 
 std::shared_ptr<Stmt> Parser::panicStatement() {

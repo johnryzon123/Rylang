@@ -73,6 +73,10 @@ struct RyValue {
 	Instance asInstance() const { return std::get<Instance>(val); }
 
 	std::string toString() const;
+	bool operator==(const RyValue &other) const { return val == other.val; }
+
+	bool operator!=(const RyValue &other) const { return val != other.val; }
+
 };
 
 #endif

@@ -246,12 +246,12 @@ namespace Frontend {
 					return;
 				case TokenType::DIVIDE:
 					if (rd == 0)
-						throw RyRuntimeError(expr.op_t, "Cannot Divide with zero.");
+						throw RyRuntimeError(expr.op_t, "Cannot Divide with zero.", "MathError");
 					lastResult = ld / rd;
 					return;
 				case TokenType::PERCENT:
 					if (rd == 0)
-						throw RyRuntimeError(expr.op_t, "Cannot get remainder of division with zero.");
+						throw RyRuntimeError(expr.op_t, "Cannot get remainder of division with zero.", "MathError");
 
 					// For double-based modulo (allows 10.5 % 3)
 					lastResult = std::fmod(ld, rd);
@@ -313,7 +313,7 @@ namespace Frontend {
 			}
 		}
 
-		throw RyRuntimeError(expr.op_t, "Operands must be numbers or matching types.");
+		throw RyRuntimeError(expr.op_t, "Operands must be numbers or matching types.", "MathError");
 	}
 
 	void Interpreter::visitRange(RangeExpr &expr) {
@@ -1139,7 +1139,11 @@ namespace Frontend {
 			failEnv->define(stmt.error.lexeme, error.message);
 
 			// Execute the failure logic
-			executeBlock(stmt.failBody, *failEnv);
+			if (error.type == stmt.errorType.lexeme) {
+				executeBlock(stmt.failBody, *failEnv);
+			} else {
+				throw error;
+			}
 
 		} catch (const std::exception &e) {
 			// Fallback for non-Ry specific C++ exceptions
