@@ -293,6 +293,10 @@ void Resolver::visitAttemptStmt(AttemptStmt &stmt) {
 
 	resolve(stmt.failBody);
 	endScope();
+
+	beginScope();
+	resolve(stmt.finallyBody);
+	endScope();
 }
 void Resolver::visitPanicStmt(PanicStmt &stmt) {
 	beginScope();
