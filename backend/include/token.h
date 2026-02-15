@@ -79,6 +79,7 @@ namespace Backend {
 		ATTEMPT,
 		FAIL,
 		PANIC,
+		FINALLY,
 
 
 		// Misc
@@ -107,5 +108,5 @@ namespace Backend {
 			{"skip", TokenType::SKIP},			 {"unless", TokenType::UNLESS},		{"until", TokenType::UNTIL},
 			{"do", TokenType::DO},					 {"class", TokenType::CLASS},			{"private", TokenType::PRIVATE},
 			{"childof", TokenType::CHILDOF}, {"attempt", TokenType::ATTEMPT}, {"fail", TokenType::FAIL},
-			{"panic", TokenType::PANIC}};
+			{"panic", TokenType::PANIC}, {"finally", TokenType::FINALLY}};
 } // namespace Backend

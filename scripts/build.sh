@@ -9,16 +9,16 @@ CYAN='\033[36m'
 BOLD='\033[1m'
 RESET='\033[0m'
 
-SEARCH_DIRS="backend interp middleend modules main.cpp"
+SEARCH_DIRS="backend/include interp/include middleend/include modules"
 
-# 2. Check for changes in the last 30 seconds
+# Check for changes in the last 30 seconds
 HEADER_CHANGES=$(find $SEARCH_DIRS -name "*.h" -o -name "*.hpp" -newermt "30 seconds ago" 2>/dev/null | wc -l)
 SOURCE_CHANGES=$(find $SEARCH_DIRS -name "*.cpp" -newermt "30 seconds ago" 2>/dev/null | wc -l)
 
 echo -e "${BLUE}${BOLD}--- Ry Build System ---${RESET}"
 
 if [ "$HEADER_CHANGES" -gt 0 ]; then
-    echo -e "🏗️  ${YELLOW}Detected $HEADER_CHANGES header changes.${RESET} Full rebuild risk: ${BOLD}Using -j1${RESET}"
+    echo -e "🏗️  ${YELLOW}Detected $HEADER_CHANGES header changes.${RESET} ${BOLD}Using -j1${RESET}"
     JOBS=1
 elif [ "$SOURCE_CHANGES" -gt 0 ]; then
     echo -e "⚡ ${CYAN}Detected $SOURCE_CHANGES source changes.${RESET} Incremental build: ${BOLD}Using -j2${RESET}"
@@ -31,10 +31,12 @@ fi
 # Execute Build
 cmake --build build -j $JOBS
 
-# 6. Success Check with Colors
+# Success Check 
 if [ $? -eq 0 ]; then
-    echo -e "\n${GREEN}${BOLD}✅ Build complete.${RESET}"
+    cp build/ry bin
+    cp build/*.so lib
+    echo -e "\n${GREEN}${BOLD} Build complete.${RESET}"
 else
-    echo -e "\n${RED}${BOLD}❌ Build failed.${RESET} Check the errors above."
+    echo -e "\n${RED}${BOLD} Build failed.${RESET} Check the errors above."
     exit 1
 fi

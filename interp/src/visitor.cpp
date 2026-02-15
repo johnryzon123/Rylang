@@ -1146,6 +1146,9 @@ namespace Frontend {
 			is_panicking = true;
 			std::cerr << "Internal Engine Error: " << e.what() << "\n";
 		}
+		if (!stmt.finallyBody.empty()) {
+			executeBlock(stmt.finallyBody, *environment);
+		}
 	}
 	void Interpreter::visitPanicStmt(PanicStmt &stmt) {
 		RyValue message;

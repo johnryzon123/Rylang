@@ -749,23 +749,28 @@ std::shared_ptr<Stmt> Parser::classStatement() {
 
 std::shared_ptr<Stmt> Parser::attemptStatement() {
 	std::vector<std::shared_ptr<Stmt>> attemptBody;
-	std::vector<std::shared_ptr<Stmt>> catchBody;
+	std::vector<std::shared_ptr<Stmt>> failBody;
 	Token error = Token(TokenType::Nothing_Here, "", RyValue(), 0, 0);
+	std::vector<std::shared_ptr<Stmt>> finallyBody;
 
 	consume(TokenType::LBRACE, "Expect '{' before attempt block");
 	attemptBody = block();
 	if (match({TokenType::FAIL})) {
 		error = consume(TokenType::IDENTIFIER, "Expect error name after 'fail'");
 		consume(TokenType::LBRACE, "Expect '{' before fail block");
-		catchBody = block();
+		failBody = block();
 	}
-	return std::make_shared<AttemptStmt>(std::move(attemptBody), std::move(catchBody), error);
+	if (match({TokenType::FINALLY})) {
+		consume(TokenType::LBRACE, "Expect '{' before finally block");
+		finallyBody = block();
+	}
+	return std::make_shared<AttemptStmt>(std::move(attemptBody), std::move(failBody), error, finallyBody);
 }
 
 std::shared_ptr<Stmt> Parser::panicStatement() {
 	Token keyword = previous();
 	std::shared_ptr<Expr> value = nullptr;
-	if (!check(TokenType::RBRACE) && !isAtEnd()) 
+	if (!check(TokenType::RBRACE) && !isAtEnd())
 		value = expression();
 	return std::make_shared<PanicStmt>(keyword, value);
 }

@@ -217,9 +217,10 @@ namespace Backend {
 		std::vector<std::shared_ptr<Stmt>> attemptBody;
 		std::vector<std::shared_ptr<Stmt>> failBody;
 		Token error;
+		std::vector<std::shared_ptr<Stmt>> finallyBody;
 
-		AttemptStmt(std::vector<std::shared_ptr<Stmt>> aBody, std::vector<std::shared_ptr<Stmt>> fBody, Token e) :
-				attemptBody(aBody), failBody(fBody), error(e) {}
+		AttemptStmt(std::vector<std::shared_ptr<Stmt>> aBody, std::vector<std::shared_ptr<Stmt>> fBody, Token e, std::vector<std::shared_ptr<Stmt>> fiBody) :
+				attemptBody(aBody), failBody(fBody), error(e), finallyBody(std::move(fiBody)) {}
 		void accept(StmtVisitor &visitor) override { visitor.visitAttemptStmt(*this); }
 	};
 	struct PanicStmt : public Stmt {
