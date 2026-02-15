@@ -1,5 +1,6 @@
 #include <cmath>
 #include "class.h"
+#include "env.h"
 #include "lexer.h"
 #include "native_io.hpp"
 #include "native_list.hpp"
@@ -1114,5 +1115,35 @@ namespace Frontend {
 
 		auto klass = std::make_shared<RyClass>(stmt.name.lexeme, methods, fieldBlueprints, superclass);
 		environment->define(stmt.name.lexeme, std::static_pointer_cast<RyCallable>(klass));
+	}
+	void Interpreter::visitAttemptStmt(AttemptStmt &stmt) {
+		// Snapshot the panic state.
+		bool was_panicking = is_panicking;
+		is_panicking = false;
+
+		try {
+			// Try the primary block.
+			// Create a local environment just like your visitBlockStmt does.
+			auto attemptEnv = std::make_shared<Environment>(this->environment);
+
+			executeBlock(stmt.attemptBody, *attemptEnv);
+
+		} catch (const RyRuntimeError &error) {
+			// Reset is_panicking to false so the fail block can actually run.
+			is_panicking = false;
+
+			// Create a new environment for the 'fail' block
+			auto failEnv = std::make_shared<Environment>(this->environment);
+
+			failEnv->define(stmt.error.lexeme, error.message);
+
+			// Execute the failure logic
+			executeBlock(stmt.failBody, *failEnv);
+
+		} catch (const std::exception &e) {
+			// Fallback for non-Ry specific C++ exceptions
+			is_panicking = true;
+			std::cerr << "Internal Engine Error: " << e.what() << "\n";
+		}
 	}
 } // namespace Frontend

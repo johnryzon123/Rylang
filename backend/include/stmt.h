@@ -34,6 +34,8 @@ namespace Backend {
 	struct ForStmt;
 	struct AttemptStmt;
 	struct StmtVisitor;
+	struct PanicStmt;
+
 
 	struct Stmt : public std::enable_shared_from_this<Stmt> {
 		virtual ~Stmt() = default;
@@ -58,6 +60,7 @@ namespace Backend {
 		virtual void visitForStmt(ForStmt &stmt) = 0;
 		virtual void visitClassStmt(ClassStmt &stmt) = 0;
 		virtual void visitAttemptStmt(AttemptStmt &stmt) = 0;
+		virtual void visitPanicStmt(PanicStmt &stmt) = 0;
 	};
 
 
@@ -216,7 +219,15 @@ namespace Backend {
 		Token error;
 
 		AttemptStmt(std::vector<std::shared_ptr<Stmt>> aBody, std::vector<std::shared_ptr<Stmt>> fBody, Token e) :
-			attemptBody(aBody), failBody(fBody), error(e) {}
+				attemptBody(aBody), failBody(fBody), error(e) {}
 		void accept(StmtVisitor &visitor) override { visitor.visitAttemptStmt(*this); }
+	};
+	struct PanicStmt : public Stmt {
+		Token keyword;
+		std::shared_ptr<Expr> message; // The message to throw
+
+		PanicStmt(Token keyword, std::shared_ptr<Expr> value) : keyword(keyword), message(std::move(value)) {}
+
+		void accept(StmtVisitor &visitor) override { visitor.visitPanicStmt(*this); }
 	};
 } // namespace Backend

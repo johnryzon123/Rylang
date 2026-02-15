@@ -281,3 +281,16 @@ void Resolver::visitShift(ShiftExpr &expr) {
 	resolve(expr.left);
 	resolve(expr.right);
 }
+void Resolver::visitAttemptStmt(AttemptStmt &stmt) {
+	beginScope();
+	resolve(stmt.attemptBody);
+	endScope();
+
+	beginScope();
+
+	declare(stmt.error);
+	define(stmt.error);
+
+	resolve(stmt.failBody);
+	endScope();
+}

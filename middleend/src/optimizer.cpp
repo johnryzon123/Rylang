@@ -41,8 +41,10 @@ void Optimizer::visitMath(MathExpr &expr) {
 				result = ld * rd;
 				break;
 			case TokenType::DIVIDE:
-				if (rd == 0 || ld == 0)
-					break; // Don't optimize div by zero, let runtime handle it
+				if (rd == 0) {
+					lastFolded = std::make_shared<MathExpr>(left, expr.op_t, right);
+					return;
+				}
 				result = ld / rd;
 				break;
 			default:

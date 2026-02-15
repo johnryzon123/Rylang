@@ -72,4 +72,5 @@ public:
 	void visitBitwiseXor(BitwiseXorExpr &expr);
 	void visitBitwiseAnd(BitwiseAndExpr &expr);
 	void visitShift(ShiftExpr &expr);
+	void visitAttemptStmt(AttemptStmt &stmt);
 };

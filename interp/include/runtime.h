@@ -88,6 +88,7 @@ namespace Frontend {
 		void visitSkipStmt(SkipStmt &stmt) override;
 		void visitForStmt(ForStmt &stmt) override;
 		void visitClassStmt(ClassStmt &stmt) override;
+		void visitAttemptStmt(AttemptStmt &stmt) override;
 	};
 
 } // namespace Frontend

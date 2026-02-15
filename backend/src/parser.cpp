@@ -392,6 +392,8 @@ std::shared_ptr<Stmt> Parser::statement() {
 		return eachStatement();
 	if (match({TokenType::CLASS}))
 		return classStatement();
+	if (match({TokenType::ATTEMPT}))
+		return attemptStatement();
 	return expressionStatement();
 }
 
@@ -746,14 +748,16 @@ std::shared_ptr<Stmt> Parser::classStatement() {
 std::shared_ptr<Stmt> Parser::attemptStatement() {
 	std::vector<std::shared_ptr<Stmt>> attemptBody;
 	std::vector<std::shared_ptr<Stmt>> catchBody;
+	Token error = Token(TokenType::Nothing_Here, "", RyValue(), 0, 0);
 
 	consume(TokenType::LBRACE, "Expect '{' before attempt block");
 	attemptBody = block();
 	if (match({TokenType::FAIL})) {
+		error = consume(TokenType::IDENTIFIER, "Expect error name after 'fail'");
 		consume(TokenType::LBRACE, "Expect '{' before fail block");
 		catchBody = block();
 	}
-	return std::make_shared<AttemptStmt>(std::move(attemptBody), std::move(catchBody));
+	return std::make_shared<AttemptStmt>(std::move(attemptBody), std::move(catchBody), error);
 
 }
 

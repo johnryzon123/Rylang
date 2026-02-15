@@ -78,6 +78,7 @@ namespace Backend {
 		CHILDOF,
 		ATTEMPT,
 		FAIL,
+		PANIC,
 
 
 		// Misc
@@ -105,5 +106,6 @@ namespace Backend {
 			{"in", TokenType::IN},					 {"foreach", TokenType::EACH},		{"stop", TokenType::STOP},
 			{"skip", TokenType::SKIP},			 {"unless", TokenType::UNLESS},		{"until", TokenType::UNTIL},
 			{"do", TokenType::DO},					 {"class", TokenType::CLASS},			{"private", TokenType::PRIVATE},
-			{"childof", TokenType::CHILDOF}, {"attempt", TokenType::ATTEMPT}, {"fail", TokenType::FAIL}};
+			{"childof", TokenType::CHILDOF}, {"attempt", TokenType::ATTEMPT}, {"fail", TokenType::FAIL},
+			{"panic", TokenType::PANIC}};
 } // namespace Backend
