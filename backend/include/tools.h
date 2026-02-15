@@ -40,15 +40,9 @@ namespace RyTools {
 
 #ifdef _WIN32
 		// Windows logic
-		if (const char *userProfile = std::getenv("USERPROFILE")) {
-			searchPaths.push_back(std::string(userProfile) + "/AppData/Local/Ry/lib");
-		}
-		searchPaths.push_back("C:/Program Files/Ry/lib");
+		searchPaths.push_back("C:/ry/modules");
 #else
 		// Unix (Linux/Mac) logic
-		if (const char *homeEnv = std::getenv("HOME")) {
-			searchPaths.push_back(std::string(homeEnv) + "/.local/share/ry/lib");
-		}
 		searchPaths.push_back("/usr/lib/ry/");
 #endif
 

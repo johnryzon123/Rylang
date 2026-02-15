@@ -1,42 +1,58 @@
 @echo off
-:: Use %~dp0 to get the directory where the script is located
-set "SOURCE_BIN=%~dp0bin"
-set "SOURCE_LIB=%~dp0lib"
+setlocal enabledelayedexpansion
+
+:: Get the directory where the script is located (project root/bin/ or project root/)
+set "SOURCE_ROOT=%~dp0.."
 set "INSTALL_DIR=C:\ry"
+set "STD_LIB_DIR=%INSTALL_DIR%\modules"
 
-echo %BOLD%--- Ry Windows Installer ---%RESET%
+echo --- Ry Windows System-Wide Installer ---
 
-:: Check for Admin Rights
+:: Admin Check
 net session >nul 2>&1
 if %errorLevel% neq 0 (
-    echo [ERROR] Please run this script as Administrator.
+    echo [ERROR] Please run as Administrator to install to C:\ and update PATH.
     pause
     exit /b 1
 )
 
-:: Create directories
-echo Creating directories at %INSTALL_DIR%...
+:: Create folders
+echo Creating directories...
 if not exist "%INSTALL_DIR%\bin" mkdir "%INSTALL_DIR%\bin"
 if not exist "%INSTALL_DIR%\lib" mkdir "%INSTALL_DIR%\lib"
+if not exist "%STD_LIB_DIR%" mkdir "%STD_LIB_DIR%"
 
-:: Copy files (using /Y to overwrite)
-echo Copying Ry binaries...
-copy /Y "%SOURCE_BIN%\ry.exe" "%INSTALL_DIR%\bin\"
-if exist "%SOURCE_LIB%\*.dll" (
-    copy /Y "%SOURCE_LIB%\*.dll" "%INSTALL_DIR%\lib\"
+:: Copy Binaries and Shared Libs (.exe and .dll)
+echo Copying Ry binaries and core DLLs...
+copy /Y "%SOURCE_ROOT%\bin\ry.exe" "%INSTALL_DIR%\bin\" >nul
+if exist "%SOURCE_ROOT%\lib\*.dll" (
+    copy /Y "%SOURCE_ROOT%\lib\*.dll" "%INSTALL_DIR%\lib\" >nul
 )
 
-:: Add to PATH
-:: Check if C:\ry\bin is already in the path before adding it
-echo Checking PATH configuration...
+:: Copy Standard Library (The .ry files and C++ modules)
+echo Installing Ry Standard Library...
+:: Copy .ry files from modules/library
+if exist "%SOURCE_ROOT%\modules\library\*" (
+    xcopy /Y /E "%SOURCE_ROOT%\modules\library\*" "%STD_LIB_DIR%\" >nul
+)
+:: Copy .dll modules from modules/lib_cpp
+if exist "%SOURCE_ROOT%\modules\lib_cpp\*.dll" (
+    copy /Y "%SOURCE_ROOT%\modules\lib_cpp\*.dll" "%STD_LIB_DIR%\" >nul
+)
+
+:: Set Environment Variables
+echo Configuring Environment...
+
+:: Add bin to PATH if not already there
 echo %PATH% | findstr /I /C:";%INSTALL_DIR%\bin" >nul
 if %errorlevel% neq 0 (
-    echo Adding %INSTALL_DIR%\bin to System PATH...
     setx /M PATH "%PATH%;%INSTALL_DIR%\bin"
-) else (
-    echo %INSTALL_DIR%\bin is already in PATH.
 )
 
+:: Set RY_LIB_PATH so the interpreter knows where to look for 'use()'
+setx /M RY_LIB_PATH "%STD_LIB_DIR%"
+
 echo.
-echo Ry installation complete! You can now type 'ry' in a new CMD window.
+echo Ry installation complete! 
+echo Standard Library installed to: %STD_LIB_DIR%
 pause
