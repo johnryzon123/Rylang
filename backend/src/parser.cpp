@@ -753,7 +753,7 @@ std::shared_ptr<Stmt> Parser::attemptStatement() {
 	std::vector<std::shared_ptr<Stmt>> failBody;
 	Token error = Token(TokenType::Nothing_Here, "", RyValue(), 0, 0);
 	std::vector<std::shared_ptr<Stmt>> finallyBody;
-	Token errorType = Token(TokenType::IDENTIFIER, "GeneralError", RyValue(), 0, 0);
+	Token errorType = Token(TokenType::Nothing_Here, "", RyValue(), 0, 0);
 
 	consume(TokenType::LBRACE, "Expect '{' before attempt block.");
 	attemptBody = block();

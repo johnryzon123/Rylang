@@ -94,7 +94,11 @@ while isRunning {
     isRunning = false 
   } else {
     data myCalc = Calculator(line)
-    data answer = myCalc.solve()
-    out(answer)
+    attempt {
+        data answer = myCalc.solve()
+        out(answer)
+    } fail err :: MathError {
+        out(err)
+    }
   }
 }

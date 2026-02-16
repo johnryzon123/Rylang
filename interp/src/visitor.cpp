@@ -1131,29 +1131,40 @@ namespace Frontend {
 		bool was_panicking = is_panicking;
 		is_panicking = false;
 
+		bool caught = false; // Track if it handled the error
+
 		try {
 			auto attemptEnv = std::make_shared<Environment>(this->environment);
 			executeBlock(stmt.attemptBody, *attemptEnv);
 		} catch (const RyRuntimeError &error) {
-			is_panicking = false;
-
-			// If the lexeme is empty, it's catch-all.
+			// Check if it should catch this specific error
 			bool isCatchAll = stmt.errorType.lexeme.empty() || stmt.errorType.type == TokenType::Nothing_Here;
+			bool typeMatch = (error.type.isString() && error.type.asString() == stmt.errorType.lexeme);
 
-			if (isCatchAll || error.type == stmt.errorType.lexeme) {
+			if (isCatchAll || typeMatch) {
+				is_panicking = false; // Stop the engine from panicking
 				auto failEnv = std::make_shared<Environment>(this->environment);
 				failEnv->define(stmt.error.lexeme, error.message);
 				executeBlock(stmt.failBody, *failEnv);
+				caught = true; // Mark as handled!
 			} else {
-				throw error;
+				// Not the type. Run finally because 'throw' exits the function immediately
+				if (!stmt.finallyBody.empty()) {
+					executeBlock(stmt.finallyBody, *environment);
+				}
+				throw;
 			}
 		}
-		if (!stmt.finallyBody.empty()) {
+
+		if (!caught && !stmt.finallyBody.empty()) {
 			executeBlock(stmt.finallyBody, *environment);
 		}
 
-		// Restore the panic state if didn't catch anything
-		is_panicking = was_panicking;
+		// Only restore the old panic state if it NEVER caught an error.
+		// If caught it, is_panicking stays FALSE so the program continues.
+		if (!caught) {
+			is_panicking = was_panicking;
+		}
 	}
 
 	void Interpreter::visitPanicStmt(PanicStmt &stmt) {
