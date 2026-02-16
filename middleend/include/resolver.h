@@ -3,7 +3,6 @@
 #include <vector>
 #include "common.h"
 #include "expr.h"
-#include "runtime.h"
 #include "stmt.h"
 
 using namespace Backend;

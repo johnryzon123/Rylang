@@ -35,6 +35,8 @@ set_target_properties(ry PROPERTIES OUTPUT_NAME "ry")
 # This allows the .so to find the 'Interpreter' class inside 'ry'
 set_target_properties(ry PROPERTIES ENABLE_EXPORTS ON)
 
-# The Module
+# The Standard library
 add_library(ry_string SHARED modules/lib_cpp/string.cpp)
+add_library(ry_file SHARED modules/lib_cpp/file.cpp)
 target_link_libraries(ry_string ry_core)
+target_link_libraries(ry_file ry_core)

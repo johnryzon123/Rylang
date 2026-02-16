@@ -1,5 +1,9 @@
-data x = 1
-while (x < 5) {
-    out("Value: " + x)
-    x = x + 1
+attempt {
+    attempt {
+        out(10/0)
+    } fail err :: IOError {
+        out("This won't catch it!")
+    }
+} fail err {
+    out("Caught the MathError in the outer block: ${err}")
 }

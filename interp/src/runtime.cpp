@@ -316,7 +316,8 @@ namespace Frontend {
 				}
 
 				// Call report with the new sourceLine argument
-				RyTools::report(error.token.line, error.token.column, "", error.message, src);
+
+				RyTools::report(error.token.line, error.token.column, "", error.message, src, !error.isPanicking);
 				RyTools::hadError = true;
 			} catch (const std::exception &e) {
 				std::cerr << "Internal System Error: " << e.what() << std::endl;

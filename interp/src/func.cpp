@@ -46,10 +46,11 @@ namespace Frontend {
 		} catch (ReturnSignal &returnValue) {
 			interpreter.environment = previous;
 			result = returnValue.value;
+		} catch (...) {
+			interpreter.environment = previous;
+			throw;
 		}
 		interpreter.environment = previous;
-
-
 
 
 		if (declaration->returnTypeAlias.has_value()) {

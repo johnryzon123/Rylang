@@ -1,5 +1,6 @@
 #include "resolver.h"
 #include "tools.h"
+#include "runtime.h"
 
 using namespace Backend;
 using namespace RyTools;
@@ -215,9 +216,7 @@ void Resolver::visitAliasStmt(AliasStmt &stmt) {
 void Resolver::visitNamespaceStmt(NamespaceStmt &stmt) {
 	declare(stmt.name);
 	define(stmt.name);
-	beginScope();
 	resolve(stmt.body);
-	endScope();
 }
 void Resolver::visitEachStmt(EachStmt &stmt) {
 	resolve(stmt.collection);

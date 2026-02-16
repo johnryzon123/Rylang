@@ -5,6 +5,7 @@
 
 #include <filesystem>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include "colors.h"
@@ -18,7 +19,7 @@ namespace RyTools {
 	inline bool hadError = false;
 
 	inline void report(int line, int col, const std::string &where, const std::string &message,
-										 const std::string currentSourceCode) {
+										 const std::string currentSourceCode, bool showCaret = true) {
 		std::cerr << RyColor::RED << RyColor::BOLD << "Error" << RyColor::RESET << where << ": " << message << std::endl;
 
 		// Extract the line from currentSourceCode
@@ -28,10 +29,12 @@ namespace RyTools {
 			for (int i = 0; i < line; ++i)
 				std::getline(ss, lineText);
 
-			// 3. Print the caret
-			std::cerr << "  " << RyColor::CYAN << line << " | " << RyColor::RESET << lineText << std::endl;
-			std::cerr << RyColor::CYAN << "    | " << RyColor::RESET << std::string(col - 1, ' ') << RyColor::RED << "^~~"
-								<< RyColor::RESET << std::endl;
+			if (showCaret) {
+				// Print the caret
+				std::cerr << "  " << RyColor::CYAN << line << " | " << RyColor::RESET << lineText << std::endl;
+				std::cerr << RyColor::CYAN << "    | " << RyColor::RESET << std::string(col - 1, ' ') << RyColor::RED << "^~~"
+									<< RyColor::RESET << std::endl;
+			}
 		}
 		hadError = true;
 	}
@@ -91,9 +94,10 @@ namespace RyTools {
 		const Backend::Token token;
 		const std::string message;
 		RyValue type;
+		bool isPanicking;
 
-		RyRuntimeError(Backend::Token token, std::string message, RyValue type = "GeneralError") :
-				token(std::move(token)), message(std::move(message)), type(type) {}
+		RyRuntimeError(Backend::Token token, std::string message, RyValue type = RyValue(), bool isPanicking=false) :
+				token(std::move(token)), message(std::move(message)), type(type), isPanicking(isPanicking) {}
 	};
 	struct ParseError : public std::runtime_error {
 		ParseError() : std::runtime_error("") {}

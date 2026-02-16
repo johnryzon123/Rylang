@@ -7,6 +7,7 @@
 #include "native_list.hpp"
 #include "native_sys.hpp"
 #include "parser.h"
+#include "resolver.h"
 #include "runTools.h"
 #include "runtime.h"
 #include "stmt.h"
@@ -851,10 +852,14 @@ namespace Frontend {
 			const std::string source = readFile(sourcePath);
 			Backend::Lexer moduleLexer(source);
 			const auto moduleTokens = moduleLexer.scanTokens();
+			Resolver moduleResolver(*this);
 			Backend::Parser moduleParser(moduleTokens, typeAliases, source);
 
 			// Get the full list of statements
 			auto moduleStmts = moduleParser.parse();
+
+
+			moduleResolver.resolve(moduleStmts);
 
 			// Execute in the Global Scope
 			// We temporarily switch to 'globals' so the module's
@@ -862,8 +867,13 @@ namespace Frontend {
 			std::shared_ptr<Environment> previous = this->environment;
 			this->environment = globals;
 
-			for (const auto &s: moduleStmts) {
-				execute(s.get());
+			try {
+				for (const auto &s: moduleStmts) {
+					execute(s.get());
+				}
+			} catch (...) {
+				this->environment = previous;
+				throw;
 			}
 
 			// Restore original environment
@@ -1118,47 +1128,39 @@ namespace Frontend {
 		environment->define(stmt.name.lexeme, std::static_pointer_cast<RyCallable>(klass));
 	}
 	void Interpreter::visitAttemptStmt(AttemptStmt &stmt) {
-		// Snapshot the panic state.
 		bool was_panicking = is_panicking;
 		is_panicking = false;
 
 		try {
-			// Try the primary block.
-			// Create a local environment just like your visitBlockStmt does.
 			auto attemptEnv = std::make_shared<Environment>(this->environment);
-
 			executeBlock(stmt.attemptBody, *attemptEnv);
-
 		} catch (const RyRuntimeError &error) {
-			// Reset is_panicking to false so the fail block can actually run.
 			is_panicking = false;
 
-			// Create a new environment for the 'fail' block
-			auto failEnv = std::make_shared<Environment>(this->environment);
+			// If the lexeme is empty, it's catch-all.
+			bool isCatchAll = stmt.errorType.lexeme.empty() || stmt.errorType.type == TokenType::Nothing_Here;
 
-			failEnv->define(stmt.error.lexeme, error.message);
-
-			// Execute the failure logic
-			if (error.type == stmt.errorType.lexeme) {
+			if (isCatchAll || error.type == stmt.errorType.lexeme) {
+				auto failEnv = std::make_shared<Environment>(this->environment);
+				failEnv->define(stmt.error.lexeme, error.message);
 				executeBlock(stmt.failBody, *failEnv);
 			} else {
 				throw error;
 			}
-
-		} catch (const std::exception &e) {
-			// Fallback for non-Ry specific C++ exceptions
-			is_panicking = true;
-			std::cerr << "Internal Engine Error: " << e.what() << "\n";
 		}
 		if (!stmt.finallyBody.empty()) {
 			executeBlock(stmt.finallyBody, *environment);
 		}
+
+		// Restore the panic state if didn't catch anything
+		is_panicking = was_panicking;
 	}
+
 	void Interpreter::visitPanicStmt(PanicStmt &stmt) {
 		RyValue message;
 		if (stmt.message != nullptr)
 			message = evaluate(stmt.message.get());
 
-		throw RyRuntimeError(stmt.keyword, message.toString());
+		throw RyRuntimeError(stmt.keyword, message.toString(), true);
 	}
 } // namespace Frontend

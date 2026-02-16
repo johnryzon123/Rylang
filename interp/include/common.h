@@ -32,6 +32,8 @@ namespace Frontend {
 	class ExternalNative;
 } // namespace Frontend
 
+class Resolver;
+
 // Global configurations
 struct RyValue {
 	using List = std::shared_ptr<std::vector<RyValue>>;
