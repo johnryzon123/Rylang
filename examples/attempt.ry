@@ -1,0 +1,8 @@
+# attempt.ry
+attempt {
+    out("Working...")
+    out("Printing '10/0'")
+    out(10/0)
+} fail err {
+    out("Error: " + err)
+}
